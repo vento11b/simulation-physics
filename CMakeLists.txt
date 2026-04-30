@@ -1,7 +1,8 @@
 cmake_minimum_required(VERSION 3.15)
-project(simulation C)
+project(simulation C CXX)
 
 include(FetchContent)
+
 
 FetchContent_Declare(
     glfw
