@@ -20,6 +20,12 @@ FetchContent_MakeAvailable(glad)
 add_library(glad ${glad_SOURCE_DIR}/src/glad.c)
 target_include_directories(glad PUBLIC ${glad_SOURCE_DIR}/include)
 
+FetchContent_Declare(
+    glm
+    GIT_REPOSITORY https://github.com/g-truc/glm.git
+)
+FetchContent_MakeAvailable(glm)
+
 #add_subdirectory(${CMAKE_SOURCE_DIR}/lib/glfw-3.4)
 add_subdirectory(src)
 
