@@ -3,11 +3,9 @@
 #include "triangle.hpp"
 
 Triangle::Triangle() {
-
-    position = glm::vec3();
-    angle = 0;
-    transform.position = position;
-    transform.rotation = angle;
+    model.position = glm::vec2(100,100);
+    model.rotation = 0;
+    model.scale = glm::vec2(100, 100);
 
 
     mesh->vertices = {
@@ -26,9 +24,12 @@ Triangle::Triangle() {
                             "layout (location = 0) in vec2 aPos;\n"
                             "layout (location = 1) in vec3 aColor;\n"
                             "out vec3 vColor;\n"
+                            "uniform mat4 projection;\n"
+                            "uniform mat4 view;\n"
+                            "uniform mat4 model;\n"
                             "void main()\n"
                             "{\n"
-                            "   gl_Position = vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
+                            "   gl_Position = projection * view * model * vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
                             "   vColor = aColor;\n"
                             "}\0";
                             

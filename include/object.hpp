@@ -38,7 +38,7 @@ typedef struct {
     glm::vec2 scale;
 
     glm::mat4 getMatrix();
-} Transform;
+} Model;
 
 
 typedef struct {
@@ -54,7 +54,7 @@ typedef struct {
 
 class Object {
 public:
-    Transform transform;
+    Model model;
     Mesh* mesh;
     Shader* shader;
 

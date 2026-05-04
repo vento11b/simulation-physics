@@ -5,11 +5,11 @@
 #include "object.hpp"
 
 
-glm::mat4 Transform::getMatrix() {
-    glm::mat4 transformation =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
-    transformation =            glm::rotate(transformation, rotation, glm::vec3(0,0,1));
-    transformation =            glm::scale(transformation, glm::vec3(scale, 0.0f));
-    return transformation;
+glm::mat4 Model::getMatrix() {
+    glm::mat4 matrix =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+    matrix =            glm::rotate(matrix, rotation, glm::vec3(0,0,1));
+    matrix =            glm::scale(matrix, glm::vec3(scale, 0.0f));
+    return matrix;
 }
 
 void Mesh::add(unsigned int location, int size) {
@@ -56,9 +56,9 @@ Object::Object() {
 void Object::draw(glm::mat4& view, glm::mat4& projection) {
     shader->use();
 
-    glm::mat4 model = transform.getMatrix();
+    glm::mat4 matrix_model = model.getMatrix();
 
-    shader->setMat4("model", model);
+    shader->setMat4("model", matrix_model);
     shader->setMat4("view", view);
     shader->setMat4("projection", projection);
 
@@ -69,11 +69,6 @@ void Object::draw(glm::mat4& view, glm::mat4& projection) {
 void Object::draw() {
     shader->use();
 
-    //glm::mat4 model = transform.getMatrix();
-
-    //shader->setMat4("model", model);
-
     glBindVertexArray(mesh->VAO);
     glDrawElements(GL_TRIANGLES, mesh->vertex_count, GL_UNSIGNED_INT, 0);
-    //9 std::printf("%d\n", mesh->vertex_count);
 }
