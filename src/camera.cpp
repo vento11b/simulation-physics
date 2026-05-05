@@ -5,3 +5,6 @@
 glm::mat4 Camera::getView() {
     return glm::translate(glm::mat4(1.0f), glm::vec3(-position, 0.0f));
 }
+//Camera::Camera(glm::vec2 _position, float _speed) {
+    
+//}

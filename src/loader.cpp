@@ -1,6 +1,8 @@
 #include <cstdio>
 #include "object.hpp"
 #include "loader.hpp"
+#include "shader.hpp"
+#include <vector>
 
 
 int Loader::load_mesh(Mesh *mesh){
@@ -12,10 +14,10 @@ int Loader::load_mesh(Mesh *mesh){
     glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh->stride, mesh->vertices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh->vertices.size()*sizeof(float), mesh->vertices.data(), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6*sizeof(unsigned int), mesh->indices.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, mesh->indices.size()*sizeof(unsigned int), mesh->indices.data(), GL_STATIC_DRAW);
 
     mesh->applyLayout();
 
@@ -31,55 +33,11 @@ int Loader::load_mesh(Mesh *mesh){
     return 0;
 }
 
-int Loader::load_shader(Shader *shader){
-    // vertex shader
-    unsigned int vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    glShaderSource(vertexShader, 1, &shader->vertex_source, NULL);
-    glCompileShader(vertexShader);
-    // check for shader compile errors
-    int success;
-    char infoLog[512];
-    glGetShaderiv(vertexShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(vertexShader, 512, NULL, infoLog);
-        std::printf("ERROR::SHADER::VERTEX::COMPILATION_FAILED\n%s\n", infoLog);
-        return -1;
-    }
-    // fragment shader
-    unsigned int fragmentShader = glCreateShader(GL_FRAGMENT_SHADER);
-    glShaderSource(fragmentShader, 1, &shader->fragment_source, NULL);
-    glCompileShader(fragmentShader);
-    // check for shader compile errors
-    glGetShaderiv(fragmentShader, GL_COMPILE_STATUS, &success);
-    if (!success)
-    {
-        glGetShaderInfoLog(fragmentShader, 512, NULL, infoLog);
-        std::printf("ERROR::SHADER::FRAGMENT::COMPILATION_FAILED\n%s\n", infoLog);
-        return -2;
-    }
-    // link shaders
-    unsigned int shaderProgram = glCreateProgram();
-    glAttachShader(shaderProgram, vertexShader);
-    glAttachShader(shaderProgram, fragmentShader);
-    glLinkProgram(shaderProgram);
-    // check for linking errors
-    glGetProgramiv(shaderProgram, GL_LINK_STATUS, &success);
-    if (!success) {
-        glGetProgramInfoLog(shaderProgram, 512, NULL, infoLog);
-        std::printf("ERROR::SHADER::PROGRAM::LINKING_FAILED\n%s\n", infoLog);
-        return -3;
-    }
-    glDeleteShader(vertexShader);
-    glDeleteShader(fragmentShader);
 
-    shader->shader = shaderProgram;
-    return 0;
-}
 
 
 int Loader::load(Object *object) {
-    return (load_mesh(object->mesh) == 0) && (load_shader(object->shader) == 0);
+    return (load_mesh(object->mesh) == 0);// && (load_shader(object->shader) == 0);
 }
 
 

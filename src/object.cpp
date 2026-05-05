@@ -4,7 +4,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include "object.hpp"
 
-
 glm::mat4 Model::getMatrix() {
     glm::mat4 matrix =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
     matrix =            glm::rotate(matrix, rotation, glm::vec3(0,0,1));
@@ -39,15 +38,6 @@ void Mesh::applyLayout() {
     }
 }
 
-
-void Shader::use() {
-    glUseProgram(shader);
-}
-
-void Shader::setMat4(const char* name, glm::mat4& m) {
-    glUniformMatrix4fv(glGetUniformLocation(shader, name), 1, GL_FALSE, &m[0][0]);
-}
-
 Object::Object() {
     mesh = new Mesh;
     shader = new Shader;
@@ -63,7 +53,7 @@ void Object::draw(glm::mat4& view, glm::mat4& projection) {
     shader->setMat4("projection", projection);
 
     glBindVertexArray(mesh->VAO);
-    glDrawArrays(GL_TRIANGLES, 0, mesh->vertex_count);
+    glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 void Object::draw() {

@@ -1,12 +1,7 @@
 #pragma once
 #include <glad/glad.h>
 #include <glm/glm.hpp>
-
-enum class shader_type {
-    vertex = GL_VERTEX_SHADER,
-    fragment = GL_FRAGMENT_SHADER,
-    geometry = GL_GEOMETRY_SHADER
-};
+#include "shader.hpp"
 
 
 typedef struct {
@@ -39,18 +34,6 @@ typedef struct {
 
     glm::mat4 getMatrix();
 } Model;
-
-
-typedef struct {
-    shader_type type;
-    const char *vertex_source;
-    const char *fragment_source;
-    unsigned int shader;
-
-    void use();
-
-    void setMat4(const char* name, glm::mat4& m);
-} Shader;
 
 class Object {
 public:

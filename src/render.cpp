@@ -7,7 +7,24 @@
 #include "camera.hpp"
 #include "object.hpp"
 #include "loader.hpp"
+#include "circle.hpp"
 #include "triangle.hpp"
+
+#include <iostream>
+
+
+template<typename T>
+std::ostream& operator<<(std::ostream& os, const std::vector<T>& v) {
+    os << "[";
+    for (size_t i = 0; i < v.size(); ++i) {
+        os << v[i];
+        if (i != v.size() - 1)
+            os << ", ";
+    }
+    os << "]";
+    return os;
+}
+
 
 int width = 800, height = 600;
 
@@ -16,7 +33,7 @@ void cursor_position_callback(GLFWwindow* window, double xpos, double ypos);
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods);
 
 
-Camera camera;
+Camera camera(glm::vec2(0,0), 1.0f);
 int main() {
     Window window(width, height);
     window.init();
@@ -32,14 +49,18 @@ int main() {
     
     
     Loader loader;
-    Triangle t;
-    loader.load(&t);
 
-    camera.position = glm::vec2(0,0);
-    camera.speed = 1.0f;
+    Circle c1(glm::vec2(400, 300), glm::vec2(50), 20);
+    loader.load(&c1);
+    c1.shader->compile();
+    c1.shader->link();
+
+
+    //std::cout << c1.mesh->vertices << "\n";
+    //std::cout << c1.mesh->indices << "\n";
+
     while(!glfwWindowShouldClose(window.window) && !glfwWindowShouldClose(window.window)) {
         glfwPollEvents();    
-        
         glClear(GL_COLOR_BUFFER_BIT);
         
         glm::mat4 view = camera.getView();
@@ -47,7 +68,8 @@ int main() {
             0.0f, (float)width,
             0.0f, (float)height
         );
-        t.draw(view, projection);
+        
+        c1.draw(view, projection);
 
         glfwSwapBuffers(window.window);
     }
