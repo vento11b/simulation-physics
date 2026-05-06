@@ -1,4 +1,4 @@
-#include <cstdio>
+f#include <cstdio>
 #include <cmath>
 #include "circle.hpp"
 
@@ -21,7 +21,7 @@ Circle::Circle(glm::vec2 _position, glm::vec2 _scale, float _rotation, int _divi
     std::printf("%f\n", angle_gap);
     for (int i = 0; i < divisions; i++) {
         mesh->vertices.insert(mesh->vertices.end(), {
-            0.5f*cos(i*angle_gap),  0.5f*sin(i*angle_gap),   0.0f, 0.0f, 1.0f
+            (float)(0.5f*cos(i*angle_gap)),  (float)(0.5f*sin(i*angle_gap)),   0.0f, 0.0f, 1.0f
         });
     }
     
@@ -34,24 +34,12 @@ Circle::Circle(glm::vec2 _position, glm::vec2 _scale, float _rotation, int _divi
         0, (unsigned int)divisions, 1
     });
 
-    shader->sub_shaders.push_back(Shader(GL_VERTEX_SHADER, "#version 330 core\n"
-                            "layout (location = 0) in vec2 aPos;\n"
-                            "layout (location = 1) in vec3 aColor;\n"
-                            "out vec3 vColor;\n"
-                            "uniform mat4 projection;\n"
-                            "uniform mat4 view;\n"
-                            "uniform mat4 model;\n"
-                            "void main()\n"
-                            "{\n"
-                            "   gl_Position = projection * view * model * vec4(aPos.x, aPos.y, 0.0, 1.0);\n"
-                            "   vColor = aColor;\n"
-                            "}\0"));
-                            
-    shader->sub_shaders.push_back(Shader(GL_FRAGMENT_SHADER, "#version 330 core\n"
-                              "in vec3 vColor;\n"
-                              "out vec4 FragColor;\n"
-                              "void main()\n"
-                              "{\n"
-                              "   FragColor = vec4(vColor, 1.0f);\n"
-                              "}\n\0"));
+    //shader->sub_shaders.push_back(Shader(GL_VERTEX_SHADER, "./shaders/default_vertex_circle.glsl"));
+    //                        
+    //shader->sub_shaders.push_back(Shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment_circle.glsl"));
 }
+
+//Shader Circle::default_vertex_shader(GL_VERTEX_SHADER, "./shaders/default_vertex_circle.glsl");
+//Shader Circle::default_fragment_shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment_circle.glsl");
+Shader Circle::default_shader({Shader(GL_VERTEX_SHADER, "./shaders/default_vertex_circle.glsl"), Shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment_circle.glsl")});
+Shader a({Shader(), Shader()})
