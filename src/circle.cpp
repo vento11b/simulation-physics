@@ -1,45 +1,42 @@
-f#include <cstdio>
+#include <cstdio>
 #include <cmath>
+#include <vector>
 #include "circle.hpp"
 
-Circle::Circle(glm::vec2 _position, glm::vec2 _scale, float _rotation, int _divisions) {
+Circle::Circle(glm::vec2 _position, glm::vec2 _scale, float _rotation, glm::vec<3, unsigned char> _color, int _divisions, Shader* _shader) {
     divisions = _divisions;
     
-    model.position = glm::vec2(_position);
-    model.rotation = _rotation;
-    model.scale = glm::vec2(_scale);
-    
-    mesh->add(0, 2);
-    mesh->add(1, 3);
+    position = glm::vec2(_position);
+    rotation = _rotation;
+    scale = glm::vec2(_scale);
+    color = glm::vec<3, char>(_color);
 
     mesh->vertex_count = divisions+1;
+    mesh->index_count = divisions*3;
+    
+    mesh->vertices = new float[mesh->vertex_count][2];
+    mesh->indices = new unsigned int[mesh->index_count];
 
-    mesh->vertices.insert(mesh->vertices.end(), {0.0f, 0.0f,   0.0f, 0.0f, 1.0f});
-
-
+    float _vertex[2] = {0.0f, 0.0f};
+    memcpy(mesh->vertices[0], &_vertex, 2 * sizeof(float));
+    //std::printf("%f, %f\n", _vertex[0], _vertex[0]);
+    
     float angle_gap = (2*M_PI)/divisions;
-    std::printf("%f\n", angle_gap);
     for (int i = 0; i < divisions; i++) {
-        mesh->vertices.insert(mesh->vertices.end(), {
-            (float)(0.5f*cos(i*angle_gap)),  (float)(0.5f*sin(i*angle_gap)),   0.0f, 0.0f, 1.0f
-        });
+        float _vertex[2] = {(float)(0.5f*cos(i*angle_gap)),  (float)(0.5f*sin(i*angle_gap))};
+        memcpy(mesh->vertices[i+1], &_vertex, 2 * sizeof(float));
+        
+        //std::printf("%f, %f\n", _vertex[0], _vertex[1]);
+    }
+
+    for (unsigned int i = 1; i < divisions; i++) {
+        unsigned int _index[3] = {0, i, i+1};
+        memcpy(mesh->indices+(i-1)*3, &_index, 3 * sizeof(unsigned int));
     }
     
-    for (unsigned int i = 1; i < divisions; i++) {
-        mesh->indices.insert(mesh->indices.end(), {
-            0, i, i+1
-        });
-    }
-    mesh->indices.insert(mesh->indices.end(), {
-        0, (unsigned int)divisions, 1
-    });
+    unsigned int _index[3] = {0, (unsigned int)divisions, 1};
+    memcpy(mesh->indices + (divisions-1)*3, &_index, 3 * sizeof(unsigned int));
 
-    //shader->sub_shaders.push_back(Shader(GL_VERTEX_SHADER, "./shaders/default_vertex_circle.glsl"));
-    //                        
-    //shader->sub_shaders.push_back(Shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment_circle.glsl"));
+    shader=_shader;
 }
 
-//Shader Circle::default_vertex_shader(GL_VERTEX_SHADER, "./shaders/default_vertex_circle.glsl");
-//Shader Circle::default_fragment_shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment_circle.glsl");
-Shader Circle::default_shader({Shader(GL_VERTEX_SHADER, "./shaders/default_vertex_circle.glsl"), Shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment_circle.glsl")});
-Shader a({Shader(), Shader()})

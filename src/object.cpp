@@ -2,63 +2,66 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+
 #include "object.hpp"
+#include "window.hpp"
+#include "camera.hpp"
+#include "shader.hpp"
 
-glm::mat4 Model::getMatrix() {
-    glm::mat4 matrix =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
-    matrix =            glm::rotate(matrix, rotation, glm::vec3(0,0,1));
-    matrix =            glm::scale(matrix, glm::vec3(scale, 0.0f));
-    return matrix;
-}
 
-void Mesh::add(unsigned int location, int size) {
-    VertexAttribute attr;
-    attr.location = location;
-    attr.size = size;
-    attr.type = GL_FLOAT;
-    attr.normalized = false;
-    attr.offset = stride;
+static float default_vertices[3][2] = {{-0.5f, -0.5f},
+                                        {0.0f,  0.5f}, 
+                                        {0.5f, -0.5f}};
 
-    stride += size * sizeof(float);
-    attributes.push_back(attr);
-}
+static unsigned int default_indices[3] = {0,1,2};
 
-void Mesh::applyLayout() {
-    for (const VertexAttribute attr : attributes) {
-        glVertexAttribPointer(
-            attr.location,
-            attr.size,
-            attr.type,
-            attr.normalized,
-            stride,
-            (void*)attr.offset
-        );
+Mesh Object::default_mesh = Mesh(default_vertices, 3, default_indices, 3);
 
-        glEnableVertexAttribArray(attr.location);
-    }
-}
+static Shader default_vertex_shader(GL_VERTEX_SHADER, "./shaders/default_vertex.glsl");
+static Shader default_fragment_shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment.glsl");
+Shader Object::default_shader = Shader({&default_vertex_shader, &default_fragment_shader});
 
-Object::Object() {
-    mesh = new Mesh;
-    shader = new Shader;
+
+void Object::draw(Window window) {
+    shader->use();
+
+    glm::mat4 model =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+    model =            glm::rotate(model, rotation, glm::vec3(0,0,1));
+    model =            glm::scale(model, glm::vec3(scale, 0.0f));
+    glm::mat4 view = window.camera->getView();
+    glm::mat4 projection = glm::ortho(  -window.width  / 2.0f / window.camera->zoom,
+                                         window.width  / 2.0f / window.camera->zoom,
+                                        -window.height / 2.0f / window.camera->zoom,
+                                         window.height / 2.0f / window.camera->zoom);
+    
+    shader->setVec3("color", color);
+    shader->setMat4("model", model);
+    shader->setMat4("view", view);
+    shader->setMat4("projection", projection);
+
+    glBindVertexArray(mesh->VAO);
+    glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
 }
 
 void Object::draw(glm::mat4& view, glm::mat4& projection) {
     shader->use();
 
-    glm::mat4 matrix_model = model.getMatrix();
+    glm::mat4 model =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
+    model =            glm::rotate(model, rotation, glm::vec3(0,0,1));
+    model =            glm::scale(model, glm::vec3(scale, 0.0f));
 
-    shader->setMat4("model", matrix_model);
+    shader->setVec3("color", color);
+    shader->setMat4("model", model);
     shader->setMat4("view", view);
     shader->setMat4("projection", projection);
 
     glBindVertexArray(mesh->VAO);
-    glDrawElements(GL_TRIANGLES, mesh->indices.size(), GL_UNSIGNED_INT, 0);
+    glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, 0);
 }
 
 void Object::draw() {
     shader->use();
 
     glBindVertexArray(mesh->VAO);
-    glDrawElements(GL_TRIANGLES, mesh->vertex_count, GL_UNSIGNED_INT, 0);
+    glDrawElements(mesh->type, mesh->vertex_count, GL_UNSIGNED_INT, 0);
 }

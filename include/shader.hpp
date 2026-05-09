@@ -2,6 +2,7 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include <vector>
+#include <cstdio>
 
 //#include <cstdio>
 
@@ -17,17 +18,22 @@ struct Shader {
     unsigned int program;
 
     unsigned int type;
-    const char* file = NULL;
-    const char* source;
+    const char* filename = NULL;
+    const char* source = NULL;
+    bool linked = false;
     void use();
     int compile();
     int link();
     void setMat4(const char* name, glm::mat4& m);
+    void setVec3(const char* name, glm::vec<3, unsigned char>& v);
+    void add_shader(Shader* _sub_shader);
 
     Shader() {};
-    Shader(unsigned int _type, const char* _source) : type(_type), source(_source) {};
-    Shader(const std::vector<Shader>& _sub_shaders) {for (Shader& i : _sub_shaders) sub_shaders.push_back(&i);};
+    //Shader(unsigned int _type, const char* _source) : type(_type), source(_source) {};
+    Shader(unsigned int _type, const char* _filename);
+    Shader(std::vector<Shader*> _sub_shaders);
+    
     //Shader(Shader _sub_shaders[]) {sub_shaders.insert(sub_shaders.end(), _sub_shaders);};
-    Shader(Shader *_sub_shader) {sub_shaders.push_back(_sub_shader);};
+    Shader(Shader* _sub_shader);
 
 };

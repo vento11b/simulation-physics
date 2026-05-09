@@ -1,11 +1,15 @@
 #pragma once
-#include <cstdlib>
-#include <tuple>
-#include <vertex.hpp>
+#include <glad/glad.h>
 
-template <typename... vertices>
 struct Mesh {
-    std::tuple<vertices>;
-    vertices N_attributes[] = {N_attributes...}
-    Vertex<T_values, ...sizes> vertex[sizeof(N_attributes)];
+    Mesh(float (*_vertices)[2], unsigned int _vertex_count, unsigned int* _indices, unsigned int _index_count, GLenum _type = GL_TRIANGLES) : vertices(_vertices), vertex_count(_vertex_count), indices(_indices), index_count(_index_count), type(_type), loaded(false) {};
+    float (*vertices)[2];
+    unsigned int* indices;
+    GLenum type;
+    unsigned int vertex_count;
+    unsigned int index_count;
+    unsigned int VAO;
+    unsigned int VBO;
+    unsigned int EBO;
+    bool loaded;
 };
