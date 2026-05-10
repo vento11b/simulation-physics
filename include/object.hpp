@@ -19,8 +19,8 @@ struct Object {
     void draw(Window window);
     void draw();
 
-    Mesh* mesh;
-    Shader* shader;
+    Mesh* mesh = NULL;
+    Shader* shader = NULL;
 
     glm::vec2 position{400.0f, 300.0f};
     glm::vec2 scale{200.0f};

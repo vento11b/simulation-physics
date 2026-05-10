@@ -11,7 +11,7 @@ public:
     bool dragging;
     glm::mat4 getView();
     Camera(glm::vec2 _position, float _speed) : position(_position), speed(_speed) {};
-    static void cursor_position_callback(GLFWwindow* wwindow, double xpos, double ypos);
-    static void scroll_callback(GLFWwindow* wwindow, double xoffset, double yoffset);
-    static void mouse_button_callback(GLFWwindow* wwindow, int button, int action, int mods);
+    void cursor_position_callback(double xpos, double ypos);
+    void scroll_callback(double xoffset, double yoffset);
+    void mouse_button_callback(int button, int action, int mods);
 };

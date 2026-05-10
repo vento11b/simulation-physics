@@ -5,7 +5,7 @@
 
 class Window {
 public:
-    GLFWwindow* window;
+    GLFWwindow* glwindow;
     Camera* camera;
     int width, height;
 
@@ -14,5 +14,9 @@ public:
     int init();
     void use();
     int loadGlad();
-    static void framebuffer_size_callback(GLFWwindow* window, int _width, int _height);
+
+    static void framebuffer_size_callback(GLFWwindow* glwindow, int _width, int _height);
+    static void cursor_position_callback(GLFWwindow* glwindow, double xpos, double ypos);
+    static void scroll_callback(GLFWwindow* glwindow, double xoffset, double yoffset);
+    static void mouse_button_callback(GLFWwindow* glwindow, int button, int action, int mods);
 };

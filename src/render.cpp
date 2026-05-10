@@ -1,21 +1,27 @@
 #include <iostream>
 #include <cstdio>
-
 #include <random>
 #include <ctime>
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
+#include <ui/imgui.h>
+#include <ui/backends/imgui_impl_glfw.h>
+#include <ui/backends/imgui_impl_opengl3.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include "ui/ui.hpp"
 #include "window.hpp"
 #include "camera.hpp"
 #include "object.hpp"
 #include "circle.hpp"
 #include "entitysystem.hpp"
+#include "batch.hpp"
 
+void print_uints(const unsigned int *p, unsigned int n);
 
 float randomf(float min, float max);
 
@@ -38,57 +44,89 @@ int main() {
     window.init();
     window.use();
     window.loadGlad();
+    
+    Ui ui(&window);
+    ui.init();
 
     
     glViewport(0, 0, window.width, window.height); 
     glClearColor(0.2f, 0.3f, 0.3f, 5.0f);
     
     
-    glfwSetWindowUserPointer(window.window,  &window);
-    glfwSetMouseButtonCallback(window.window, Camera::mouse_button_callback);
-    glfwSetCursorPosCallback(window.window, Camera::cursor_position_callback);
-    glfwSetScrollCallback(window.window, Camera::scroll_callback);
+    glfwSetWindowUserPointer(window.glwindow,  &window);
 
-    glfwSetFramebufferSizeCallback(window.window, Window::framebuffer_size_callback);
+    glfwSetMouseButtonCallback(window.glwindow, Window::mouse_button_callback);
+    glfwSetCursorPosCallback(window.glwindow, Window::cursor_position_callback);
+    glfwSetScrollCallback(window.glwindow, Window::scroll_callback);
+    glfwSetFramebufferSizeCallback(window.glwindow, Window::framebuffer_size_callback);
     
     std::srand(std::time(0));
 
 
     EntitySystem es;
+    
+    Circle tempCircle;
+    Mesh* circleMesh = tempCircle.mesh;
+    Shader* circleShader = tempCircle.shader;
 
-    //es.entities.push_back(new Object(glm::vec2{0}, glm::vec2{100}, 0.0f, glm::vec3{0, 256, 0}));
-    //es.entities.push_back(new Circle());
-    
-    //print_vec2_array(es.entities[0]->mesh->vertices, es.entities[0]->mesh->vertex_count);
-    //std::printf("%s\n", es.entities[0]->shader->sub_shaders[0]->source);
-    //print_uints(es.entities[0]->mesh->indices, es.entities[0]->mesh->index_count);
-    //std::printf("%d, %d, %d\n", es.entities[0]->color.x, es.entities[0]->color.y, es.entities[0]->color.z);
-    
-    //for (int i = 0; i<100000; i++) {
-    //    es.entities.insert(es.entities.end(), {new Object(  glm::vec2(randomf(-window.width/2, window.width/2), randomf(-window.height/2, window.height/2)),
-    //                                                        glm::vec2(randomf(1, 10)),
-    //                                                        randomf(0, 360),
-    //                                                        glm::vec3(randomf(0,256), randomf(0, 256), randomf(0, 256)))});
-    //}
-    es.entities.reserve(10000);
-    for (int i = 0; i<10000; i++) {
-        es.entities.insert(es.entities.end(), {new Circle(  glm::vec2(randomf(-window.width/2, window.width/2), randomf(-window.height/2, window.height/2)),
-                                                            //glm::vec2(randomf(1, 10)),
-                                                            glm::vec2(10),
-                                                            glm::vec3((unsigned int)randomf(0,256), (unsigned int)randomf(0, 256), (unsigned int)randomf(0, 256)),
-                                                            25  )});
+    Batch circleBatch(circleMesh, circleShader);
+    es.load(&tempCircle);
+    // Agrega instancias (puedes usar tu bucle actual)
+    for (int i = 0; i < 1'000'000; ++i) {
+        glm::vec2 pos = glm::vec2(randomf(-100'000, 100'000), randomf(-100'000, 100'000));
+        glm::vec2 scale = glm::vec2(100);
+        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
+        model = glm::scale(model, glm::vec3(scale, 0.0f));
+        glm::vec3 color = glm::vec3(randomf(0,256), randomf(0,256), randomf(0,256));
+        circleBatch.addInstance(model, color);
     }
+    circleBatch.updateInstanceBuffer();
     
-    es.load();
+    
+    
+    double last_time = glfwGetTime();
 
-    while(!glfwWindowShouldClose(window.window) && !glfwWindowShouldClose(window.window)) {
+    int frames = 0;
+    double fps = 0.0;
+    while(!glfwWindowShouldClose(window.glwindow) && !glfwWindowShouldClose(window.glwindow)) {
+        frames++;
+
+    double current = glfwGetTime();
+    double elapsed = current - last_time;
+
+    if (elapsed >= 1.0)
+    {
+        fps = frames / elapsed;
+
+        frames = 0;
+        last_time = current;
+    }
         glfwPollEvents();    
         glClear(GL_COLOR_BUFFER_BIT);
         
-        //std::printf("%d, %d\n", window.width, window.height);
-        es.draw(window);
+        
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        
+        
+        ImGui::Begin("Test");
+        //ImGui::ShowMetricsWindow();
+        ImGui::Text("FPS: %.1f", fps);
+        if (ImGui::Button("Click me")) {
+            printf("CLICK!\n");
+        }
+        //render = !render;
+        //if (render) es.draw(window);
 
-        glfwSwapBuffers(window.window);
+        circleBatch.draw(window);
+
+        ImGui::End();
+
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+        glfwSwapBuffers(window.glwindow);
     }
 
     glfwTerminate();
