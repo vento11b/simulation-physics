@@ -8,7 +8,7 @@
 class EntitySystem {
 public:
     void load();
-    void load(Object* object);
+    static void load(Object* object);
     
     void draw();
     void draw(Window window);

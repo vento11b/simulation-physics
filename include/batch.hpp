@@ -5,6 +5,7 @@
 #include "mesh.hpp"
 #include "shader.hpp"
 #include "window.hpp"
+#include "entitysystem.hpp"
 
 struct InstanceData {
     glm::mat4 model;
@@ -18,8 +19,10 @@ public:
     GLuint instanceVBO = 0;
     std::vector<InstanceData> instances;
 
-    Batch(Mesh* mesh_, Shader* shader_)
-        : mesh(mesh_), shader(shader_) {}
+    Batch(Object* object)
+        : mesh(object->mesh), shader(object->shader) {
+            EntitySystem::load(object);
+        }
 
     void addInstance(const glm::mat4& model, const glm::vec3& color) {
         instances.push_back({model, color});

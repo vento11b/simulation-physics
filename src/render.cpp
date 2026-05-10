@@ -62,70 +62,48 @@ int main() {
     
     std::srand(std::time(0));
 
+    Circle particle;
+    Batch entity_batch(&particle);
 
-    EntitySystem es;
-    
-    Circle tempCircle;
-    Mesh* circleMesh = tempCircle.mesh;
-    Shader* circleShader = tempCircle.shader;
-
-    Batch circleBatch(circleMesh, circleShader);
-    es.load(&tempCircle);
-    // Agrega instancias (puedes usar tu bucle actual)
     for (int i = 0; i < 1'000'000; ++i) {
         glm::vec2 pos = glm::vec2(randomf(-100'000, 100'000), randomf(-100'000, 100'000));
         glm::vec2 scale = glm::vec2(100);
         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
         model = glm::scale(model, glm::vec3(scale, 0.0f));
         glm::vec3 color = glm::vec3(randomf(0,256), randomf(0,256), randomf(0,256));
-        circleBatch.addInstance(model, color);
+        entity_batch.addInstance(model, color);
     }
-    circleBatch.updateInstanceBuffer();
+    entity_batch.updateInstanceBuffer();
     
-    
-    
-    double last_time = glfwGetTime();
 
+    double last_time = glfwGetTime();
     int frames = 0;
     double fps = 0.0;
-    while(!glfwWindowShouldClose(window.glwindow) && !glfwWindowShouldClose(window.glwindow)) {
+    while(!glfwWindowShouldClose(window.glwindow)) {
         frames++;
+        double current = glfwGetTime();
+        double elapsed = current - last_time;
+        if (elapsed >= 1.0)
+        {
+            fps = frames / elapsed;
 
-    double current = glfwGetTime();
-    double elapsed = current - last_time;
-
-    if (elapsed >= 1.0)
-    {
-        fps = frames / elapsed;
-
-        frames = 0;
-        last_time = current;
-    }
+            frames = 0;
+            last_time = current;
+        }
         glfwPollEvents();    
         glClear(GL_COLOR_BUFFER_BIT);
-        
         
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        
-        
-        ImGui::Begin("Test");
-        //ImGui::ShowMetricsWindow();
+        ImGui::Begin("UI");
         ImGui::Text("FPS: %.1f", fps);
-        if (ImGui::Button("Click me")) {
-            printf("CLICK!\n");
-        }
-        //render = !render;
-        //if (render) es.draw(window);
-
-        circleBatch.draw(window);
-
         ImGui::End();
-
         ImGui::Render();
+        
+        entity_batch.draw(window);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-
+        
         glfwSwapBuffers(window.glwindow);
     }
 
