@@ -15,6 +15,7 @@ public:
     Particle(glm::vec2 _position, int _divisions) : Particle(_position, 2.8e-15f, 0, glm::vec<3, unsigned char>{0, 0, 255}, _divisions) {};
     Particle(glm::vec2 _position) : Particle(_position, 2.8e-15f, 0, glm::vec<3, unsigned char>{0, 0, 255}, 6) {};
     Particle(int _divisions) : Particle(glm::vec2(0,0), 2.8e-15f, 0, glm::vec<3, unsigned char>{0, 0, 255}, _divisions) {};
+    Particle(Shader* _shader) : Particle(glm::vec2(0,0), 2.8e-15f, 0, glm::vec<3, unsigned char>{0, 0, 255}, 6, _shader) {};
     Particle() : Particle(glm::vec2(0,0), 2.8e-15f, 0, glm::vec<3, unsigned char>{0, 0, 255}, 6) {};
 //private:
     int divisions = 6;

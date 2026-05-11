@@ -3,6 +3,7 @@
 #include <vector>
 
 Shader::Shader(unsigned int _type, const char* _filename) : type(_type), filename(_filename) {
+    std::printf("B\n");
     FILE* file = fopen(filename, "rb");
     fseek(file, 0, SEEK_END);
     long size = ftell(file);

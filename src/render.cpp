@@ -21,8 +21,6 @@
 #include "entitysystem.hpp"
 #include "batch.hpp"
 
-void print_uints(const unsigned int *p, unsigned int n);
-
 float randomf(float min, float max);
 
 void print_vec2_array(float (*v)[2], unsigned int count)
@@ -64,23 +62,19 @@ int main() {
     std::srand(std::time(0));
 
 
-    Particle particle;
-    
-    struct particle_instance_type {
-        glm::vec2 pos;
-        glm::vec3 color;
-    };
+    Particle particle{new Shader({new Shader{GL_VERTEX_SHADER, "shaders/particles_vertex.glsl"}, particle.shader->sub_shaders[1]})};
     
     
-    std::printf("AAA\n");
-    Batch<particle_instance_type> particle_batch{particle.mesh, new Shader{GL_VERTEX_SHADER, "particles_vertex.glsl"}};
+    
+    std::printf("A\n");
+    Batch particle_batch{particle, Model{glm::vec2(0), glm::vec2(0), 0,1,0,0}};
 
     //for (int i = 0; i < 1'000'000; ++i) {
     //    particle_batch.addInstance({glm::vec2(randomf(-1e-10, 1e-10), randomf(-1e-10, 1e-10)), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
     //}
     //particle_batch.addInstance({glm::vec2(0,0), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
 
-    //particle_batch.updateInstanceBuffer();
+    particle_batch.updateInstanceBuffer();
     
 
     double last_time = glfwGetTime();
@@ -110,7 +104,7 @@ int main() {
         ImGui::Render();
         
         //particle.draw(window);
-        //particle_batch.draw(window);
+        particle_batch.draw(window);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         
         glfwSwapBuffers(window.glwindow);

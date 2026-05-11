@@ -6,13 +6,6 @@
 
 //#include <cstdio>
 
-struct shader_program {
-    unsigned int type;
-    const char* file = NULL;
-    const char* source;
-    //shader_program(unsigned int _type, const char* _source) : type(_type), source(_source) {};
-};
-
 struct Shader {
     std::vector<Shader*> sub_shaders;
     unsigned int program;
