@@ -17,7 +17,7 @@
 #include "window.hpp"
 #include "camera.hpp"
 #include "object.hpp"
-#include "circle.hpp"
+#include "particle.hpp"
 #include "entitysystem.hpp"
 #include "batch.hpp"
 
@@ -40,10 +40,11 @@ void print_uints(const unsigned int* p, unsigned int n)
 }
 
 int main() {
-    Window window(1600, 1000);
+    Window window(1000, 800);
     window.init();
     window.use();
     window.loadGlad();
+    window.camera->zoom = 5e16f;
     
     Ui ui(&window);
     ui.init();
@@ -62,18 +63,24 @@ int main() {
     
     std::srand(std::time(0));
 
-    Circle particle;
-    Batch entity_batch(&particle);
 
-    for (int i = 0; i < 1'000'000; ++i) {
-        glm::vec2 pos = glm::vec2(randomf(-100'000, 100'000), randomf(-100'000, 100'000));
-        glm::vec2 scale = glm::vec2(100);
-        glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(pos, 0.0f));
-        model = glm::scale(model, glm::vec3(scale, 0.0f));
-        glm::vec3 color = glm::vec3(randomf(0,256), randomf(0,256), randomf(0,256));
-        entity_batch.addInstance(model, color);
-    }
-    entity_batch.updateInstanceBuffer();
+    Particle particle;
+    
+    struct particle_instance_type {
+        glm::vec2 pos;
+        glm::vec3 color;
+    };
+    
+    
+    std::printf("AAA\n");
+    Batch<particle_instance_type> particle_batch{particle.mesh, new Shader{GL_VERTEX_SHADER, "particles_vertex.glsl"}};
+
+    //for (int i = 0; i < 1'000'000; ++i) {
+    //    particle_batch.addInstance({glm::vec2(randomf(-1e-10, 1e-10), randomf(-1e-10, 1e-10)), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
+    //}
+    //particle_batch.addInstance({glm::vec2(0,0), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
+
+    //particle_batch.updateInstanceBuffer();
     
 
     double last_time = glfwGetTime();
@@ -98,10 +105,12 @@ int main() {
         ImGui::NewFrame();
         ImGui::Begin("UI");
         ImGui::Text("FPS: %.1f", fps);
+        //ImGui::Text("Particles: %zu", particle_batch.instances.size());
         ImGui::End();
         ImGui::Render();
         
-        entity_batch.draw(window);
+        //particle.draw(window);
+        //particle_batch.draw(window);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         
         glfwSwapBuffers(window.glwindow);

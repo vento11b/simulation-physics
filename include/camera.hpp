@@ -7,6 +7,8 @@ class Camera {
 public:
     glm::vec2 position;
     float zoom = 1;
+    float max_zoom = 1e17;
+    float min_zoom = 0;
     float speed;
     bool dragging;
     glm::mat4 getView();

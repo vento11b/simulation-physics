@@ -1,14 +1,15 @@
 #include <cstdio>
 #include <cmath>
 #include <vector>
-#include "circle.hpp"
+#include "particle.hpp"
 
-Circle::Circle(glm::vec2 _position, glm::vec2 _scale, float _rotation, glm::vec<3, unsigned char> _color, int _divisions, Shader* _shader) {
+Particle::Particle(glm::vec2 _position, float _radius, float _rotation, glm::vec<3, unsigned char> _color, int _divisions, Shader* _shader) {
     divisions = _divisions;
     
     position = glm::vec2(_position);
     rotation = _rotation;
-    scale = glm::vec2(_scale);
+    scale = glm::vec2(_radius);
+    radius = _radius;
     color = glm::vec<3, char>(_color);
 
     mesh->vertex_count = divisions+1;

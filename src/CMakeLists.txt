@@ -1,9 +1,10 @@
 add_executable(simulation   render.cpp
                             window.cpp
                             camera.cpp
+                            mesh.cpp
                             shader.cpp
                             object.cpp
-                            circle.cpp
+                            particle.cpp
                             entitysystem.cpp
                             
                             ui/ui.cpp

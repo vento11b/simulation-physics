@@ -20,12 +20,13 @@ void Camera::mouse_button_callback(int button, int action, int mods) {
 }
 
 void Camera::scroll_callback(double xoffset, double yoffset) {
-    if (yoffset > 0)
+    if (yoffset > 0 && (!max_zoom || (zoom*1.1f) < max_zoom))
         zoom *= 1.1f;
         
-    else
+    else if (yoffset < 0 && (!min_zoom || (zoom/1.1f) > min_zoom))
         zoom /= 1.1f;
-    //std::printf("%lf\n", yoffset);
+    
+    std::printf("%lf\n", zoom);
 
 }
 

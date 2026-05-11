@@ -7,25 +7,33 @@
 #include "window.hpp"
 #include "entitysystem.hpp"
 
-struct InstanceData {
+struct InstanceType {
     glm::mat4 model;
     glm::vec3 color;
 };
 
+template <typename InstanceType>
 class Batch {
 public:
     Mesh* mesh;
     Shader* shader;
-    GLuint instanceVBO = 0;
-    std::vector<InstanceData> instances;
+    unsigned int instanceVBO;
+    std::vector<InstanceType> instances;
 
     Batch(Object* object)
         : mesh(object->mesh), shader(object->shader) {
-            EntitySystem::load(object);
+            object->mesh->load();
+            object->shader->use();
+        }
+   
+    Batch(Mesh* mesh, Shader* shader)
+        : mesh(mesh), shader(shader) {
+            mesh->load();
+            shader->use();
         }
 
-    void addInstance(const glm::mat4& model, const glm::vec3& color) {
-        instances.push_back({model, color});
+    void addInstance(InstanceType instanceData) {
+        instances.push_back(instanceData);
     }
 
     void updateInstanceBuffer() {
@@ -34,17 +42,26 @@ public:
         }
         glBindVertexArray(mesh->VAO);
         glBindBuffer(GL_ARRAY_BUFFER, instanceVBO);
-        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(InstanceData), instances.data(), GL_DYNAMIC_DRAW);
+        glBufferData(GL_ARRAY_BUFFER, instances.size() * sizeof(InstanceType), instances.data(), GL_DYNAMIC_DRAW);
+        
         // Model matrix (mat4 = 4 vec4)
-        for (int i = 0; i < 4; ++i) {
-            glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (void*)(sizeof(float) * i * 4));
-            glEnableVertexAttribArray(1 + i);
-            glVertexAttribDivisor(1 + i, 1);
-        }
+        //for (int i = 0; i < 4; ++i) {
+        //    glVertexAttribPointer(1 + i, 4, GL_FLOAT, GL_FALSE, sizeof(InstanceType), (void*)(sizeof(float) * i * 4));
+        //    glEnableVertexAttribArray(1 + i);
+        //    glVertexAttribDivisor(1 + i, 1);
+        //}
+        
+        // Position
+        glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(InstanceType), (void*)(sizeof(float) * 4));
+        glEnableVertexAttribArray(1);
+        glVertexAttribDivisor(1, 1);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
         // Color
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceData), (void*)(sizeof(float) * 16));
-        glEnableVertexAttribArray(5);
-        glVertexAttribDivisor(5, 1);
+        glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceType), (void*)(sizeof(float) * 6));
+        glEnableVertexAttribArray(2);
+        glVertexAttribDivisor(2, 1);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }

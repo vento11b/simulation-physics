@@ -1,5 +1,5 @@
 #include "world.hpp"
-#include "circle.hpp"
+#include "particle.hpp"
 #include <fstream>
 #include <vector>
 #include <glad/glad.h>
@@ -44,13 +44,13 @@ World::~World() {
     if (ssbo) glDeleteBuffers(1, &ssbo);
     if (computeShader) glDeleteProgram(computeShader);
 }
-void World::addObject(const Circle& obj) {
+void World::addObject(const Particle& obj) {
     objects.push_back(obj);
 }
 void World::syncToGPU() {
     if (ssbo == 0) glGenBuffers(1, &ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, objects.size() * sizeof(Circle), objects.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, objects.size() * sizeof(Particle), objects.data(), GL_DYNAMIC_DRAW);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
 }
@@ -67,7 +67,7 @@ void World::syncFromGPU() {
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
     void* ptr = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
     if (ptr) {
-        memcpy(objects.data(), ptr, objects.size() * sizeof(Circle));
+        memcpy(objects.data(), ptr, objects.size() * sizeof(Particle));
         glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -76,7 +76,7 @@ void World::fillBatch(Batch& batch) {
     batch.instances.clear();
     for (const auto& obj : objects) {
         glm::mat4 model = glm::translate(glm::mat4(1.0f), glm::vec3(obj.position, 0.0f));
-        model = glm::scale(model, glm::vec3(obj.radius, obj.radius, 1.0f));
+        model = glm::scale(model, glm::vec3(obj.scale, 1.0f));
         batch.addInstance(model, obj.color);
     }
     batch.updateInstanceBuffer();

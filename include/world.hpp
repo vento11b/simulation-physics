@@ -3,12 +3,12 @@
 #include <glad/glad.h>
 #include <glm/glm.hpp>
 #include "batch.hpp"
-#include "circle.hpp"
+#include "particle.hpp"
 
 
 class World {
 public:
-    std::vector<Circle> objects;
+    std::vector<Particle> objects;
     GLuint ssbo = 0;
     GLuint computeShader = 0;
     float gravity = -500.0f;
@@ -16,7 +16,7 @@ public:
 
     World();
     ~World();
-    void addObject(const Circle& obj);
+    void addObject(const Particle& obj);
     void syncToGPU();
     void stepPhysics();
     void syncFromGPU();

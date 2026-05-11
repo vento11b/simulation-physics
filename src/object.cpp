@@ -23,6 +23,7 @@ Shader Object::default_shader = Shader({&default_vertex_shader, &default_fragmen
 
 
 void Object::draw(Window window) {
+    mesh->load();
     shader->use();
 
     glm::mat4 model =  glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f));
