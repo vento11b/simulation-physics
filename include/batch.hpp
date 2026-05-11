@@ -8,52 +8,47 @@
 #include "window.hpp"
 #include "object.hpp"
 
-struct Model {
-        Model(glm::vec2 _position, glm::vec2 _scale, float _rotation, bool _hasPosition, bool _hasScale, bool _hasRotation) {
-            position = _position;
-            scale = _scale;
-            rotation = _rotation;
-            hasPosition = _hasPosition;
-            hasScale = _hasScale;
-            hasRotation = _hasRotation;
-        }
-        glm::vec2 position{0};
-        glm::vec2 scale{100};
-        float rotation{0};
-
-        bool hasPosition=0;
-        bool hasScale=0;
-        bool hasRotation=0;
-    };
-
 struct InstanceStruct {
     glm::mat4 model;
-    glm::vec<3, unsigned int> color;
+    glm::vec<3, unsigned char> color;
 };
 
-//template <typename InstanceType>
 class Batch {
 public:
     Mesh* mesh;
     Shader* shader;
-    unsigned int instanceVBO;
+    Object* object;
+    glm::vec2 scale{2.8e-15f};
+    float rotation{0};
+    unsigned int instanceVBO = 0;
     std::vector<InstanceStruct> instances;
 
-    Batch(Object* object, Model model)
-        : mesh(object->mesh), shader(object->shader) {
-            object->mesh->load();
-            object->shader->use();
-        }
-   
-    //Batch(Mesh* mesh, Shader* shader)
-    //    : mesh(mesh), shader(shader) {
-    //        mesh->load();
-    //        shader->use();
+    //Batch(Object* object, Model _model)
+    //    : mesh(object->mesh), shader(object->shader), model(_model) {
+    //        object->mesh->load();
+    //        object->shader->use();
     //    }
+   
+    Batch(Mesh* mesh, Shader* shader)
+        : mesh(mesh), shader(shader){
+            mesh->load();
+            shader->use();
+        }
 
-    void addInstance(InstanceStruct instanceData) {
-        
-        instances.push_back(InstanceStruct());
+    void addInstance(const glm::mat4& model, const glm::vec<3, unsigned char>& color) {
+        InstanceStruct idata;
+        idata.model = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
+        idata.model = glm::rotate(idata.model, 0.0f, glm::vec3(0,0,1));
+        idata.model = glm::scale(idata.model, glm::vec3(100.0f));
+        idata.color = glm::vec<3, unsigned char>{255,0,0};
+        instances.push_back({model, color});
+    }
+
+    void addInstance(glm::vec2 position, glm::vec<3, unsigned char> color) {
+        glm::mat4 model{glm::translate(glm::mat4(1.0f), glm::vec3(position, 0.0f))};
+        model = glm::rotate(model, rotation, glm::vec3(0,0,1));
+        model = glm::scale(model, glm::vec3(scale, 0));
+        instances.push_back({model, color});
     }
 
     void updateInstanceBuffer() {
@@ -79,9 +74,10 @@ public:
         //glBindVertexArray(0);
 
         // Color
-        glVertexAttribPointer(5, 3, GL_FLOAT, GL_FALSE, sizeof(InstanceStruct), (void*)(sizeof(float) * 16));
+        glVertexAttribPointer(5, 3, GL_UNSIGNED_BYTE, GL_FALSE, sizeof(InstanceStruct), (void*)(sizeof(float) * 16));
         glEnableVertexAttribArray(5);
         glVertexAttribDivisor(5, 1);
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
     }

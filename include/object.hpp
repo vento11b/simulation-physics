@@ -32,4 +32,6 @@ struct Object {
 
     static Mesh default_mesh;
     static Shader default_shader;
+    static Shader default_vertex_shader;
+    static Shader default_fragment_shader;
 };

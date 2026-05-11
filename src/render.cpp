@@ -62,18 +62,23 @@ int main() {
     std::srand(std::time(0));
 
 
-    Particle particle{new Shader({new Shader{GL_VERTEX_SHADER, "shaders/particles_vertex.glsl"}, particle.shader->sub_shaders[1]})};
+    Particle particle;
     
     
+    Batch particle_batch{particle.mesh, new Shader({new Shader{GL_VERTEX_SHADER, "shaders/particles_vertex.glsl"}, &Object::default_fragment_shader})};
     
-    std::printf("A\n");
-    Batch particle_batch{particle, Model{glm::vec2(0), glm::vec2(0), 0,1,0,0}};
-
-    //for (int i = 0; i < 1'000'000; ++i) {
-    //    particle_batch.addInstance({glm::vec2(randomf(-1e-10, 1e-10), randomf(-1e-10, 1e-10)), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
-    //}
+    for (int i = 0; i < 1'000'000; ++i) {
+        particle_batch.addInstance(glm::vec2(randomf(-1e-12f, 1e-12f), randomf(-1e-12, 1e-12)), glm::vec<3, unsigned char>(randomf(200,256), randomf(0,10), randomf(0,10)));
+    }
     //particle_batch.addInstance({glm::vec2(0,0), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
+    
+    //glm::mat4 model{glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 0.0f))};
+    //model = glm::rotate(model, 0.0f, glm::vec3(0,0,1));
+    //model = glm::scale(model, glm::vec3(100.0f));
+    //glm::vec<3, unsigned char> color{200,0,0};
 
+    particle_batch.addInstance(glm::vec2{1e-15f}, glm::vec<3, unsigned char>{255,0,0});
+    particle_batch.addInstance(glm::vec2{1e-14f}, glm::vec<3, unsigned char>{0,0,255});
     particle_batch.updateInstanceBuffer();
     
 
@@ -105,6 +110,7 @@ int main() {
         
         //particle.draw(window);
         particle_batch.draw(window);
+        //particle_batch.draw(window);
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
         
         glfwSwapBuffers(window.glwindow);

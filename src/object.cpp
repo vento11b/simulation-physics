@@ -17,8 +17,8 @@ static unsigned int default_indices[3] = {0,1,2};
 
 Mesh Object::default_mesh = Mesh(default_vertices, 3, default_indices, 3);
 
-static Shader default_vertex_shader(GL_VERTEX_SHADER, "./shaders/default_vertex.glsl");
-static Shader default_fragment_shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment.glsl");
+Shader Object::default_vertex_shader(GL_VERTEX_SHADER, "./shaders/default_vertex.glsl");
+Shader Object::default_fragment_shader(GL_FRAGMENT_SHADER, "./shaders/default_fragment.glsl");
 Shader Object::default_shader = Shader({&default_vertex_shader, &default_fragment_shader});
 
 
