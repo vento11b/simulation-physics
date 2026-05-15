@@ -26,7 +26,6 @@ void Camera::scroll_callback(double xoffset, double yoffset) {
     else if (yoffset < 0 && (!min_zoom || (zoom/1.1f) > min_zoom))
         zoom /= 1.1f;
     
-    std::printf("%lf\n", zoom);
 
 }
 

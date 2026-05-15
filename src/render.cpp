@@ -38,6 +38,8 @@ void print_uints(const unsigned int* p, unsigned int n)
 }
 
 int main() {
+    std::srand(std::time(0));
+
     Window window(1000, 800);
     window.init();
     window.use();
@@ -49,9 +51,10 @@ int main() {
 
     
     glViewport(0, 0, window.width, window.height); 
-    glClearColor(0.2f, 0.3f, 0.3f, 5.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 5.0f);
     
-    
+    glEnable(GL_MULTISAMPLE);
+
     glfwSetWindowUserPointer(window.glwindow,  &window);
 
     glfwSetMouseButtonCallback(window.glwindow, Window::mouse_button_callback);
@@ -59,23 +62,17 @@ int main() {
     glfwSetScrollCallback(window.glwindow, Window::scroll_callback);
     glfwSetFramebufferSizeCallback(window.glwindow, Window::framebuffer_size_callback);
     
-    std::srand(std::time(0));
-
-
-    Particle particle;
+    
+    
+    Particle particle(12);
     
     
     Batch particle_batch{particle.mesh, new Shader({new Shader{GL_VERTEX_SHADER, "shaders/particles_vertex.glsl"}, &Object::default_fragment_shader})};
     
-    for (int i = 0; i < 1'000'000; ++i) {
-        particle_batch.addInstance(glm::vec2(randomf(-1e-12f, 1e-12f), randomf(-1e-12, 1e-12)), glm::vec<3, unsigned char>(randomf(200,256), randomf(0,10), randomf(0,10)));
-    }
-    //particle_batch.addInstance({glm::vec2(0,0), glm::vec3(randomf(200,256), randomf(0,10), randomf(0,10))});
-    
-    //glm::mat4 model{glm::translate(glm::mat4(1.0f), glm::vec3(100.0f, 100.0f, 0.0f))};
-    //model = glm::rotate(model, 0.0f, glm::vec3(0,0,1));
-    //model = glm::scale(model, glm::vec3(100.0f));
-    //glm::vec<3, unsigned char> color{200,0,0};
+    //particle_batch.instances.reserve(2'000'000);
+    //for (int i = 0; i < 2'000'000; ++i) {
+    //    particle_batch.addInstance(glm::vec2(randomf(-1.0e-11f, 1.0e-11f), randomf(-1.0e-11f, 1.0e-11f)), glm::vec<3, unsigned char>(randomf(200,256), randomf(0,10), randomf(0,10)));
+    //}
 
     particle_batch.addInstance(glm::vec2{1e-15f}, glm::vec<3, unsigned char>{255,0,0});
     particle_batch.addInstance(glm::vec2{1e-14f}, glm::vec<3, unsigned char>{0,0,255});
@@ -104,7 +101,7 @@ int main() {
         ImGui::NewFrame();
         ImGui::Begin("UI");
         ImGui::Text("FPS: %.1f", fps);
-        //ImGui::Text("Particles: %zu", particle_batch.instances.size());
+        ImGui::Text("Particles: %zu", particle_batch.instances.size());
         ImGui::End();
         ImGui::Render();
         
